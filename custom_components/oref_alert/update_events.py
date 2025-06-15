@@ -16,6 +16,7 @@ from custom_components.oref_alert.categories import (
     category_to_emoji,
     category_to_icon,
 )
+from custom_components.oref_alert.metadata import ALL_AREAS_ALIASES
 from custom_components.oref_alert.metadata.area_info import AREA_INFO
 from custom_components.oref_alert.metadata.areas import AREAS
 
@@ -26,6 +27,7 @@ from .const import (
     ATTR_HOME_DISTANCE,
     ATTR_TITLE,
     CONF_ALERT_ACTIVE_DURATION,
+    CONF_AREAS,
     DATA_COORDINATOR,
     DOMAIN,
 )
@@ -53,6 +55,7 @@ class OrefAlertUpdateEventManager:
         self._coordinator: OrefAlertDataUpdateCoordinator = config_entry.runtime_data[
             DATA_COORDINATOR
         ]
+        self._areas = config_entry.options[CONF_AREAS]
         self._coordinator.async_add_listener(self._async_update)
         self._async_update()
 
@@ -69,7 +72,7 @@ class OrefAlertUpdateEventManager:
             area_info = AREA_INFO[area]
             self._hass.bus.async_fire(
                 f"{DOMAIN}_update_event",
-                {
+                fired_event := {
                     ATTR_AREA: area,
                     ATTR_HOME_DISTANCE: round(
                         vincenty(
@@ -89,6 +92,12 @@ class OrefAlertUpdateEventManager:
             )
             self._previous_updates.append((expiration, update))
 
+            if self._is_selected_area(fired_event.get(ATTR_AREA)):
+                self._hass.bus.async_fire(
+                    f"{DOMAIN}_selected_update_event",
+                    fired_event,
+                )
+
     def _remove_expired(self) -> None:
         """Remove expired updates."""
         now = dt_util.now().timestamp()
@@ -101,3 +110,10 @@ class OrefAlertUpdateEventManager:
     def _is_previous_update(self, update: dict[str, Any]) -> bool:
         """Check if the update is in the previous list."""
         return any(update == entry[1] for entry in self._previous_updates)
+
+    def _is_selected_area(self, area) -> bool:
+        """Check is the area is among the selected areas."""
+        if not area:
+            return False
+
+        return area in self._areas or area in ALL_AREAS_ALIASES
