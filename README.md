@@ -107,7 +107,7 @@ Geo-location entities are created for every active alert in Israel (regardless o
 
 The [map card](https://www.home-assistant.io/dashboards/map) can be used to present the entities on a map. `oref_alert` should be added to [geo_location_sources](https://www.home-assistant.io/dashboards/map/#geo_location_sources), and [auto_fit](https://www.home-assistant.io/dashboards/map/#auto_fit) should be set to true:
 
-```
+```yml
 type: map
 entities: []
 auto_fit: true
@@ -125,7 +125,7 @@ This will create a map presenting all active alerts in Israel:
 
 A new event is fired on HA bus for any new alert. Here is an example of such an event:
 
-```
+```yml
 event_type: oref_alert_event
 data:
   area: תל אביב - מרכז העיר
@@ -142,7 +142,7 @@ In the [Mobile Notifications: Detailed Alerts](#detailed-alerts) section there i
 
 Events are also fired for updates. Their type is `oref_alert_update_event` instead of `oref_alert_event`. Here is an example of such an event:
 
-```
+```yml
 event_type: oref_alert_update_event
 data:
   area: תל אביב - מרכז העיר
@@ -280,7 +280,7 @@ Below are a few more examples:
 
 ### Coloring State Icons
 
-```
+```yml
 type: entities
 entities:
   - entity: binary_sensor.oref_alert
@@ -299,7 +299,7 @@ Note that it depends on the installation of [card-mod](https://github.com/thomas
 
 ### Displaying Countdown Timers
 
-```
+```yml
 type: entities
 entities:
   - entity: sensor.oref_alert_time_to_shelter
@@ -317,7 +317,7 @@ entities:
 
 Here is a [markdown card](https://www.home-assistant.io/dashboards/markdown/) for presenting all active alerts sorted by their distance from HA's home coordinate (the list of categories is based on [this file](https://www.oref.org.il/alerts/alertCategories.json)):
 
-```
+```yml
 type: markdown
 content: >-
   {% for alert in states.geo_location |
@@ -347,7 +347,7 @@ card_mod:
 
 Here is an automation rule for getting mobile notifications for new alerts:
 
-```
+```yml
 alias: Oref Alert Country Notifications
 id: oref_alert_country_notifications
 triggers:
@@ -387,7 +387,7 @@ current: "{{ trigger.to_state.attributes.country_active_alerts | map(attribute='
 
 This is a different approach where only alerts which are either within 30km from home or 5km from Amit's current location generate notifications. However, each notification has additional information (and being sent separately):
 
-```
+```yml
 alias: Oref Alert Country Notifications Details
 id: oref_alert_country_notifications_details
 triggers:
@@ -413,7 +413,7 @@ mode: queued
 
 Here is an automation rule for getting mobile notifications for updates:
 
-```
+```yml
 alias: Oref Alert Updates
 id: oref_alert_updates
 triggers:
@@ -444,7 +444,7 @@ actions:
 
 It's possible to set a custom sound for a specific mobile app push notification. Here is an iOS example:
 
-```
+```yml
 action: notify.mobile_app_amits_iphone
 data:
   title: התרעות פיקוד העורף
@@ -459,7 +459,7 @@ Additional information (for Android and iOS) can be found [here](https://compani
 ### Time To Shelter Countdown
 
 Here is another advanced usage for counting down (every 5 seconds) the time to shelter:
-```
+```yml
 alias: Oref Alert Time To Shelter Countdown
 id: oref_alert_time_to_shelter_countdown
 triggers:
