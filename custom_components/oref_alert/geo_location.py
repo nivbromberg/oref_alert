@@ -29,13 +29,16 @@ from .const import (
     ATTR_CATEGORY,
     ATTR_EMOJI,
     ATTR_HOME_DISTANCE,
+    ATTR_IS_SELECTED_AREA,
     ATTR_TITLE,
+    CONF_AREAS,
     DATA_COORDINATOR,
     DOMAIN,
     IST,
     LOCATION_ID_SUFFIX,
     OREF_ALERT_UNIQUE_ID,
 )
+from .metadata import ALL_AREAS_ALIASES
 from .metadata.area_info import AREA_INFO
 
 if TYPE_CHECKING:
@@ -159,6 +162,7 @@ class OrefAlertLocationEventManager:
                 ).replace(tzinfo=IST)
                 attributes[ATTR_ICON] = category_to_icon(attributes[ATTR_CATEGORY])
                 attributes[ATTR_EMOJI] = category_to_emoji(attributes[ATTR_CATEGORY])
+                attributes[ATTR_IS_SELECTED_AREA] = self._is_selected_area(area)
                 break
         return attributes
 
@@ -187,6 +191,7 @@ class OrefAlertLocationEventManager:
                     ATTR_TITLE: attributes.get(ATTR_TITLE),
                     ATTR_ICON: attributes.get(ATTR_ICON),
                     ATTR_EMOJI: attributes.get(ATTR_EMOJI),
+                    ATTR_IS_SELECTED_AREA: self._is_selected_area(area),
                 },
             )
 
@@ -214,3 +219,7 @@ class OrefAlertLocationEventManager:
 
         if len(exists - active):
             self._hass.async_create_task(self._cleanup_entities())
+
+    def _is_selected_area(self, area) -> bool:
+        """Check is the area is among the selected areas."""
+        return area in self._config_entry.options[CONF_AREAS] or area in ALL_AREAS_ALIASES

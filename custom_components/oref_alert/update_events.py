@@ -16,6 +16,7 @@ from custom_components.oref_alert.categories import (
     category_to_emoji,
     category_to_icon,
 )
+from custom_components.oref_alert.metadata import ALL_AREAS_ALIASES
 from custom_components.oref_alert.metadata.area_info import AREA_INFO
 from custom_components.oref_alert.metadata.areas import AREAS
 
@@ -24,8 +25,10 @@ from .const import (
     ATTR_CATEGORY,
     ATTR_EMOJI,
     ATTR_HOME_DISTANCE,
+    ATTR_IS_SELECTED_AREA,
     ATTR_TITLE,
     CONF_ALERT_ACTIVE_DURATION,
+    CONF_AREAS,
     DATA_COORDINATOR,
     DOMAIN,
 )
@@ -53,6 +56,7 @@ class OrefAlertUpdateEventManager:
         self._coordinator: OrefAlertDataUpdateCoordinator = config_entry.runtime_data[
             DATA_COORDINATOR
         ]
+        self._areas = config_entry.options[CONF_AREAS]
         self._coordinator.async_add_listener(self._async_update)
         self._async_update()
 
@@ -85,6 +89,7 @@ class OrefAlertUpdateEventManager:
                     ATTR_TITLE: update.get("title"),
                     ATTR_ICON: category_to_icon(update.get("category", 0)),
                     ATTR_EMOJI: category_to_emoji(update.get("category", 0)),
+                    ATTR_IS_SELECTED_AREA: self._is_selected_area(area),
                 },
             )
             self._previous_updates.append((expiration, update))
@@ -101,3 +106,7 @@ class OrefAlertUpdateEventManager:
     def _is_previous_update(self, update: dict[str, Any]) -> bool:
         """Check if the update is in the previous list."""
         return any(update == entry[1] for entry in self._previous_updates)
+
+    def _is_selected_area(self, area) -> bool:
+        """Check is the area is among the selected areas."""
+        return area in self._areas or area in ALL_AREAS_ALIASES
