@@ -182,7 +182,7 @@ class OrefAlertLocationEventManager:
             attributes = event.extra_state_attributes
             self._hass.bus.async_fire(
                 f"{DOMAIN}_event",
-                {
+                fired_event := {
                     ATTR_AREA: area,
                     ATTR_HOME_DISTANCE: event.distance,
                     ATTR_LATITUDE: event.latitude,
@@ -191,9 +191,15 @@ class OrefAlertLocationEventManager:
                     ATTR_TITLE: attributes.get(ATTR_TITLE),
                     ATTR_ICON: attributes.get(ATTR_ICON),
                     ATTR_EMOJI: attributes.get(ATTR_EMOJI),
-                    ATTR_IS_SELECTED_AREA: self._is_selected_area(area),
+                    ATTR_IS_SELECTED_AREA: attributes.get(ATTR_IS_SELECTED_AREA),
                 },
             )
+
+            if fired_event.get(ATTR_IS_SELECTED_AREA, False):
+                self._hass.bus.async_fire(
+                    f"{DOMAIN}_selected_event",
+                    fired_event,
+                )
 
     @callback
     def _async_update(self) -> None:

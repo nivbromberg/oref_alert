@@ -73,7 +73,7 @@ class OrefAlertUpdateEventManager:
             area_info = AREA_INFO[area]
             self._hass.bus.async_fire(
                 f"{DOMAIN}_update_event",
-                {
+                fired_event := {
                     ATTR_AREA: area,
                     ATTR_HOME_DISTANCE: round(
                         vincenty(
@@ -93,6 +93,12 @@ class OrefAlertUpdateEventManager:
                 },
             )
             self._previous_updates.append((expiration, update))
+
+            if fired_event.get(ATTR_IS_SELECTED_AREA, False):
+                self._hass.bus.async_fire(
+                    f"{DOMAIN}_selected_update_event",
+                    fired_event,
+                )
 
     def _remove_expired(self) -> None:
         """Remove expired updates."""
