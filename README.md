@@ -155,6 +155,37 @@ data:
   emoji: ⚠️
 ```
 
+### Events for configured areas
+Special type of events are fired if the event's area matches the user selected areas (or nationwide).
+These events are sent **on-top** of the general events.
+
+These events contain **the same data**, but has the `event_type` field set to either `oref_alert_selected_event` or `oref_alert_selected_update_event`, 
+depending on the originating event.
+
+These special events allow automating events better suited for each individual's interests.
+
+A strong use-case is sending personal notifications based on such events:
+
+```yml
+triggers:
+  - trigger: event
+    event_type: oref_alert_selected_event
+  - trigger: event
+    event_type: oref_alert_selected_update_event
+actions:
+  - action: notify.mobile_app_<DEVICE>
+    metadata: {}
+    data:
+      title: פיקוד העורף {{ trigger.event.data.emoji }}
+      message: >-
+        [{{ as_datetime(now()).strftime('%H:%M:%S') }}] {{ trigger.event.data.area }} | {{ trigger.event.data.title }}
+```
+
+Instead of out-filtering each event based on location, a costly operation, that may create a bottleneck when handling massive amounts of events at once, 
+these events ensure that the most relevant events can be used.
+
+This automation can also be set to parallel (or queued) mode, as each event triggers a separate notification.
+
 ## Synthetic Alert
 
 Synthetic alerts are useful for testing purposes. The action `oref_alert.synthetic_alert` can be used to create a synthetic alert. The action can be accessed via this My button:
