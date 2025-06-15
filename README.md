@@ -152,7 +152,7 @@ data:
   category: 13
   title: ניתן לצאת מהמרחב המוגן
   icon: mdi:message-alert
-  emoji: ⚠
+  emoji: ⚠️
 ```
 
 ## Synthetic Alert

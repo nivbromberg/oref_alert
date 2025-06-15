@@ -16,7 +16,7 @@ CATEGORY_METADATA = {
     10: ("shield-home", "⚔️", True),  # terrorattack
     11: ("home-flood", "🌊", True),  # tsunami
     12: ("biohazard", "☣️", True),  # hazmat
-    13: ("message-alert", "⚠", False),  # update
+    13: ("message-alert", "⚠️", False),  # update
     14: ("flash-alert", "⚡", False),  # flash
     15: ("alert-circle-check", "✅", False),  # missilealertdrill
     16: ("alert-circle-check", "✅", False),  # uavdrill
